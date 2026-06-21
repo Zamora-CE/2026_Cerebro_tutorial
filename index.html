@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Second Brain MVP - To Do</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- Supabase JS Client library -->
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body class="bg-zinc-900 text-white p-6 max-w-md mx-auto sans-serif">
+    <h1 class="text-3xl font-bold border-b border-zinc-700 pb-2 mb-6">🧠 TO DO []</h1>
+    
+    <!-- Input Form -->
+    <div class="flex gap-2 mb-6">
+        <input type="text" id="taskInput" placeholder="Add a new cloud task..." class="flex-1 p-2 bg-zinc-850 border border-zinc-700 rounded text-white focus:outline-none">
+        <button onclick="addTask()" class="bg-yellow-500 text-black px-4 py-2 font-bold rounded hover:bg-yellow-400">Add</button>
+    </div>
+
+    <!-- Task List -->
+    <ul id="todoList" class="space-y-3"></ul>
+
+    <script>
+        // Initialize Supabase Client
+        const SUPABASE_URL = "https://zfkytqjhriumlufanpho.supabase.co/rest/v1/";
+        const SUPABASE_ANON_KEY = "sb_publishable_YGYlo1pgW8pyN05UX-LvPQ_HAWNlHYL";
+        const supabase = client.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Fetch and display tasks on load
+        async function fetchTodos() {
+            const { data, error } = await supabase.from('todos').select('*').order('created_at', { ascending: true });
+            if (error) return console.error(error);
+            
+            const list = document.getElementById('todoList');
+            list.innerHTML = '';
+            
+            data.forEach(todo => {
+                const li = document.createElement('li');
+                li.className = `flex justify-between items-center p-3 rounded border border-zinc-800 ${todo.is_completed ? 'bg-zinc-800 line-through text-zinc-500' : 'bg-zinc-800'}`;
+                li.innerHTML = `
+                    <span>${todo.task}</span>
+                    <div class="flex gap-2">
+                        <button onclick="toggleTodo(${todo.id}, ${todo.is_completed})" class="text-xs bg-zinc-700 px-2 py-1 rounded hover:bg-zinc-600">✓</button>
+                        <button onclick="deleteTodo(${todo.id})" class="text-xs bg-red-900/50 text-red-400 px-2 py-1 rounded hover:bg-red-900">✕</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // Add task to Cloud Database
+        async function addTask() {
+            const input = document.getElementById('taskInput');
+            if (!input.value.trim()) return;
+            
+            const { error } = await supabase.from('todos').insert([{ task: input.value }]);
+            if (error) console.error(error);
+            input.value = '';
+            fetchTodos();
+        }
+
+        // Toggle task status
+        async function toggleTodo(id, currentStatus) {
+            const { error } = await supabase.from('todos').update({ is_completed: !currentStatus }).eq('id', id);
+            if (error) console.error(error);
+            fetchTodos();
+        }
+
+        // Delete task
+        async function deleteTodo(id) {
+            const { error } = await supabase.from('todos').delete().eq('id', id);
+            if (error) console.error(error);
+            fetchTodos();
+        }
+
+        // Initial Load
+        fetchTodos();
+    </script>
+</body>
+</html>

@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Second Brain MVP - To Do</title>
-    <script src="https://unpkg.com"></script>
-    <script src="https://cloudflare.com"></script>
+    <!-- Ruta COMPLETA oficial para los estilos visuales -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- Ruta COMPLETA oficial e indestructible para conectar con la base de datos -->
+    <script src="https://jsdelivr.net"></script>
 </head>
 <body class="bg-zinc-950 text-white p-6 max-w-md mx-auto sans-serif">
     <h1 class="text-3xl font-bold border-b border-zinc-800 pb-2 mb-6">🧠 TO DO []</h1>
@@ -15,9 +17,12 @@
     </div>
     <ul id="todoList" class="space-y-3"></ul>
     <script>
-        const SUPABASE_URL = "https://supabase.co";
+        // Tus credenciales reales recuperadas de tu panel de control
+        const SUPABASE_URL = "https://ztkytqjnriumfutanpno.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_YGYlo1pgW8pyN05_R8i8iw==";
+        
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         async function fetchTodos() {
             const { data, error } = await supabaseClient.from('todos').select('*').order('created_at', { ascending: true });
             if (error) return console.error(error);

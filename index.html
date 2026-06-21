@@ -15,31 +15,38 @@
     </div>
     <ul id="todoList" class="space-y-3"></ul>
     <script>
-        // URL Corregida e idéntica a tu panel de Supabase
         const SUPABASE_URL = "https://supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_YGYlo1pgW8pyN05_R8i8iw==";
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         async function fetchTodos() {
-            const { data, error } = await supabaseClient.from('todos').select('*').order('created_at', { ascending: true });
-            if (error) return console.error(error);
-            const list = document.getElementById('todoList');
-            list.innerHTML = '';
-            data.forEach(todo => {
-                const li = document.createElement('li');
-                li.className = `flex justify-between items-center p-3 rounded border border-zinc-900 ${todo.is_completed ? 'bg-zinc-900/50 line-through text-zinc-500' : 'bg-zinc-900'}`;
-                li.innerHTML = `<span>${todo.task}</span><div class="flex gap-2"><button onclick="toggleTodo(${todo.id}, ${todo.is_completed})" class="text-xs bg-zinc-800 px-2 py-1 rounded">✓</button><button onclick="deleteTodo(${todo.id})" class="text-xs bg-red-950/40 text-red-400 px-2 py-1 rounded">✕</button></div>`;
-                list.appendChild(li);
-            });
+            try {
+                const { data, error } = await supabaseClient.from('todos').select('*').order('created_at', { ascending: true });
+                if (error) throw error;
+                const list = document.getElementById('todoList');
+                list.innerHTML = '';
+                data.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.className = `flex justify-between items-center p-3 rounded border border-zinc-900 ${todo.is_completed ? 'bg-zinc-900/50 line-through text-zinc-500' : 'bg-zinc-900'}`;
+                    li.innerHTML = `<span>${todo.task}</span><div class="flex gap-2"><button onclick="toggleTodo(${todo.id}, ${todo.is_completed})" class="text-xs bg-zinc-800 px-2 py-1 rounded">✓</button><button onclick="deleteTodo(${todo.id})" class="text-xs bg-red-950/40 text-red-400 px-2 py-1 rounded">✕</button></div>`;
+                    list.appendChild(li);
+                });
+            } catch (err) {
+                console.error("Error en base de datos:", err);
+            }
         }
         async function addTask() {
             const input = document.getElementById('taskInput');
             if (!input.value.trim()) return;
-            const { error } = await supabaseClient.from('todos').insert([{ task: input.value }]);
-            if (error) console.error(error);
-            input.value = '';
-            fetchTodos();
+            try {
+                const { error } = await supabaseClient.from('todos').insert([{ task: input.value }]);
+                if (error) throw error;
+                input.value = '';
+                fetchTodos();
+            } catch (err) {
+                console.error("Error al añadir:", err);
+            }
         }
         async function toggleTodo(id, currentStatus) {
             await supabaseClient.from('todos').update({ is_completed: !currentStatus }).eq('id', id);

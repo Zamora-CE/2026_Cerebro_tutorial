@@ -25,7 +25,7 @@
         // Initialize Supabase Client
         const SUPABASE_URL = "https://zfkytqjhriumlufanpho.supabase.co/rest/v1/";
         const SUPABASE_ANON_KEY = "sb_publishable_YGYlo1pgW8pyN05UX-LvPQ_HAWNlHYL";
-        const supabase = client.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Fetch and display tasks on load
         async function fetchTodos() {

@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Second Brain MVP - To Do</title>
-    <!-- Ruta COMPLETA oficial para los estilos visuales -->
     <script src="https://jsdelivr.net"></script>
-    <!-- Ruta COMPLETA oficial e indestructible para conectar con la base de datos -->
     <script src="https://jsdelivr.net"></script>
 </head>
 <body class="bg-zinc-950 text-white p-6 max-w-md mx-auto sans-serif">
@@ -17,8 +15,8 @@
     </div>
     <ul id="todoList" class="space-y-3"></ul>
     <script>
-        // Tus credenciales reales recuperadas de tu panel de control
-        const SUPABASE_URL = "https://ztkytqjnriumfutanpno.supabase.co";
+        // URL Corregida e idéntica a tu panel de Supabase
+        const SUPABASE_URL = "https://supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_YGYlo1pgW8pyN05_R8i8iw==";
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -39,6 +37,7 @@
             const input = document.getElementById('taskInput');
             if (!input.value.trim()) return;
             const { error } = await supabaseClient.from('todos').insert([{ task: input.value }]);
+            if (error) console.error(error);
             input.value = '';
             fetchTodos();
         }
